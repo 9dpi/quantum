@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Decoder V5.7 - Matrix WebApp</title>
+    <title>Quantum Decoder V5.7</title>
     <style>
         body {
             margin: 0;
@@ -40,9 +40,16 @@
         h1 {
             font-size: 1.3rem;
             letter-spacing: 4px;
-            margin-bottom: 20px;
+            margin: 0;
             text-shadow: 0 0 10px #0f0;
             color: #0f0;
+        }
+
+        #target-date {
+            font-size: 0.9rem;
+            color: #0f0;
+            margin-bottom: 15px;
+            opacity: 0.8;
         }
 
         #advice-text {
@@ -102,14 +109,12 @@
             animation: fadeIn 1.5s;
         }
 
-        /* QR Code tỷ lệ tự nhiên - KHÔNG BỊ BÓP */
         .qr-image {
             width: 260px;
             height: auto;
             border: 4px solid #fff;
             border-radius: 10px;
             margin: 15px 0;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
 
         @keyframes fadeIn {
@@ -146,29 +151,27 @@
 
     <div class="container">
         <h1>QUANTUM DECODER V5.7</h1>
-        <div id="advice-text">HỆ THỐNG ĐANG CHỜ GIẢI MÃ TỪ WEBAPP...</div>
+        <div id="target-date">ĐANG XÁC ĐỊNH THỜI ĐIỂM...</div>
+        <div id="advice-text">HỆ THỐNG ĐANG CHỜ GIẢI MÃ...</div>
         <div class="number-box" id="num-container"></div>
         <button id="btn" onclick="fetchFromWebApp()">GIẢI MÃ MA TRẬN</button>
         <div id="qr-section">
             <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">KẾT QUẢ HỘI TỤ THÀNH CÔNG</div>
             <img src="https://raw.githubusercontent.com/9dpi/thantoan/main/qr-code-tech.jpg" class="qr-image">
-            <div style="font-size: 0.7rem; color: #0f0; margin-top: 10px; letter-spacing: 1px;">DONATE ĐỂ DUY TRÌ TẦN SỐ
-                MA TRẬN</div>
+            <div style="font-size: 0.7rem; color: #0f0; margin-top: 10px;">DONATE ĐỂ DUY TRÌ TẦN SỐ TESLA</div>
         </div>
     </div>
 
     <script>
-        // URL WEB APP CỦA BẠN
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw1LJSamQn-_ZSJXXKHjDqwsbCrQ7DQyc8hXfOVJCY4xI_ktfObM4Q0zbNz7dXC00Smhw/exec';
 
         // Hiệu ứng Matrix Rain
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const chars = "0123456789ABCDEF$+-*/";
+        const chars = "0123456789ABCDEF";
         const fontSize = 16;
         const drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
-
         function draw() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#0f0"; ctx.font = fontSize + "px monospace";
@@ -181,55 +184,59 @@
         }
         setInterval(draw, 35);
 
+        // Xử lý hiển thị ngày tháng theo Rule 20h
+        function updateDisplayDate() {
+            const now = new Date();
+            const hour = now.getHours();
+            let displayDate = new Date(now);
+
+            // Nếu từ 20:00 trở đi, tính cho ngày hôm sau
+            if (hour >= 20) {
+                displayDate.setDate(now.getDate() + 1);
+            }
+
+            const dateString = displayDate.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            document.getElementById('target-date').innerText = `TẦN SỐ NGÀY: ${dateString}`;
+        }
+        updateDisplayDate();
+
         async function fetchFromWebApp() {
             const btn = document.getElementById('btn');
             const advice = document.getElementById('advice-text');
             const container = document.getElementById('num-container');
 
             btn.style.display = 'none';
-            container.innerHTML = ''; // Xóa số cũ nếu có
-            advice.innerText = "ĐANG TRUY XUẤT TẦN SỐ MA TRẬN...";
+            container.innerHTML = '';
+            advice.innerText = "ĐANG TRUY XUẤT TẦN SỐ TESLA 3-6-9...";
 
             try {
-                // Gọi dữ liệu từ Web App
-                const response = await fetch(WEB_APP_URL);
-                if (!response.ok) throw new Error('Network response was not ok');
-
+                const response = await fetch(WEB_APP_URL, { redirect: 'follow' });
                 const data = await response.json();
 
-                // data dự kiến: { "numbers": ["12", "21", ...], "advice": "..." }
-                if (data && data.numbers && data.numbers.length > 0) {
+                if (data && data.numbers) {
                     displayResults(data.numbers, data.advice);
-                } else {
-                    throw new Error('Dữ liệu không đúng định dạng');
                 }
-
             } catch (error) {
-                console.error('Error:', error);
-                advice.innerText = "LỖI KẾT NỐI: HÃY ĐẢM BẢO WEB APP ĐÃ DEPLOY Ở CHẾ ĐỘ 'ANYONE'!";
+                advice.innerText = "LỖI KẾT NỐI VŨ TRỤ. HÃY THỬ LẠI!";
                 btn.style.display = 'inline-block';
             }
         }
 
         function displayResults(nums, adv) {
-            const container = document.getElementById('num-container');
             document.getElementById('advice-text').innerText = "LỜI KHUYÊN: " + adv;
-
             nums.forEach((n, i) => {
                 const span = document.createElement('span');
                 span.className = 'digit';
                 span.innerText = n.trim();
-                container.appendChild(span);
-                // Hiệu ứng hiện số lần lượt
-                setTimeout(() => {
-                    span.style.display = 'inline-block';
-                }, i * 600);
+                document.getElementById('num-container').appendChild(span);
+                setTimeout(() => { span.style.display = 'inline-block'; }, i * 600);
             });
-
-            // Hiện QR sau khi tất cả số đã hiện xong
-            setTimeout(() => {
-                document.getElementById('qr-section').style.display = 'block';
-            }, nums.length * 600);
+            setTimeout(() => { document.getElementById('qr-section').style.display = 'block'; }, nums.length * 600);
         }
     </script>
 </body>
