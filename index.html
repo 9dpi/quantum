@@ -158,7 +158,7 @@
         <div id="qr-section">
             <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">KẾT QUẢ HỘI TỤ THÀNH CÔNG</div>
             <img src="https://raw.githubusercontent.com/9dpi/thantoan/main/qr-code-tech.jpg" class="qr-image">
-            <div style="font-size: 0.7rem; color: #0f0; margin-top: 10px;">DONATE ĐỂ DUY TRÌ TẦN SỐ TESLA</div>
+            <div style="font-size: 0.7rem; color: #0f0; margin-top: 10px;">DONATE ĐỂ DUY TRÌ TẦN SỐ MATRIX</div>
         </div>
     </div>
 
@@ -184,14 +184,16 @@
         }
         setInterval(draw, 35);
 
-        // Xử lý hiển thị ngày tháng theo Rule 20h
+        // Xử lý hiển thị ngày tháng theo Rule 18h30
         function updateDisplayDate() {
             const now = new Date();
-            const hour = now.getHours();
+            const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+            const thresholdMinutes = 18 * 60 + 30; // 18:30
+
             let displayDate = new Date(now);
 
-            // Nếu từ 20:00 trở đi, tính cho ngày hôm sau
-            if (hour >= 20) {
+            // Nếu từ 18:30 trở đi, tính cho ngày hôm sau
+            if (currentTotalMinutes >= thresholdMinutes) {
                 displayDate.setDate(now.getDate() + 1);
             }
 
@@ -212,7 +214,7 @@
 
             btn.style.display = 'none';
             container.innerHTML = '';
-            advice.innerText = "ĐANG TRUY XUẤT TẦN SỐ TESLA 3-6-9...";
+            advice.innerText = "ĐANG TRUY XUẤT TẦN SỐ MATRIX...";
 
             try {
                 const response = await fetch(WEB_APP_URL, { redirect: 'follow' });
@@ -222,7 +224,7 @@
                     displayResults(data.numbers, data.advice);
                 }
             } catch (error) {
-                advice.innerText = "LỖI KẾT NỐI VŨ TRỤ. HÃY THỬ LẠI!";
+                advice.innerText = "LỖI KẾT NỐI MA TRẬN. HÃY THỬ LẠI!";
                 btn.style.display = 'inline-block';
             }
         }
