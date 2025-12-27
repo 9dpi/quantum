@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum V5.7 Decoder</title>
+    <title>Quantum Decoder V5.7 - Matrix WebApp</title>
     <style>
         body {
             margin: 0;
@@ -29,62 +29,69 @@
             position: relative;
             z-index: 2;
             text-align: center;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             padding: 30px;
             border: 1px solid #0f0;
-            border-radius: 10px;
-            box-shadow: 0 0 15px #0f0;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #0f0;
             width: 420px;
         }
 
         h1 {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
+            font-size: 1.3rem;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0f0;
             color: #0f0;
         }
 
         #advice-text {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #ff4444;
             margin-bottom: 20px;
-            min-height: 20px;
+            min-height: 40px;
+            line-height: 1.4;
+            font-weight: bold;
         }
 
         .number-box {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             margin: 25px 0;
-            min-height: 60px;
+            min-height: 70px;
+            flex-wrap: wrap;
         }
 
         .digit {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             background: #0f0;
             color: #000;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 18px;
+            border-radius: 6px;
             display: none;
             box-shadow: 0 0 15px #0f0;
             font-weight: bold;
+            animation: glow 1.5s infinite;
         }
 
         button {
             background: transparent;
             color: #0f0;
-            border: 1px solid #0f0;
-            padding: 15px 30px;
+            border: 2px solid #0f0;
+            padding: 15px 35px;
             cursor: pointer;
             text-transform: uppercase;
             font-weight: bold;
+            font-family: 'Courier New', monospace;
             transition: 0.3s;
+            letter-spacing: 2px;
         }
 
         button:hover {
             background: #0f0;
             color: #000;
-            box-shadow: 0 0 20px #0f0;
+            box-shadow: 0 0 30px #0f0;
         }
 
         #qr-section {
@@ -92,25 +99,42 @@
             display: none;
             border-top: 1px solid #333;
             padding-top: 20px;
-            animation: fadeIn 1s;
+            animation: fadeIn 1.5s;
         }
 
-        /* QR Code giữ nguyên tỷ lệ tự nhiên */
+        /* QR Code tỷ lệ tự nhiên - KHÔNG BỊ BÓP */
         .qr-image {
-            width: 250px;
+            width: 260px;
             height: auto;
             border: 4px solid #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             margin: 15px 0;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: translateY(10px);
             }
 
             to {
                 opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px #0f0;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #0f0;
+            }
+
+            100% {
+                box-shadow: 0 0 5px #0f0;
             }
         }
     </style>
@@ -122,33 +146,29 @@
 
     <div class="container">
         <h1>QUANTUM DECODER V5.7</h1>
-        <div id="advice-text">HỆ THỐNG ĐANG CHỜ GIẢI MÃ...</div>
-
+        <div id="advice-text">HỆ THỐNG ĐANG CHỜ GIẢI MÃ TỪ WEBAPP...</div>
         <div class="number-box" id="num-container"></div>
-
-        <button id="btn" onclick="fetchFromSheet()">GIẢI MÃ MA TRẬN</button>
-
+        <button id="btn" onclick="fetchFromWebApp()">GIẢI MÃ MA TRẬN</button>
         <div id="qr-section">
-            <div style="font-size: 0.75rem; color: #aaa;">DÀN SỐ HỘI TỤ THÀNH CÔNG</div>
+            <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">KẾT QUẢ HỘI TỤ THÀNH CÔNG</div>
             <img src="https://raw.githubusercontent.com/9dpi/thantoan/main/qr-code-tech.jpg" class="qr-image">
-            <div style="font-size: 0.7rem; color: #0f0; margin-top: 10px;">DONATE ĐỂ DUY TRÌ TẦN SỐ TESLA</div>
+            <div style="font-size: 0.7rem; color: #0f0; margin-top: 10px; letter-spacing: 1px;">DONATE ĐỂ DUY TRÌ TẦN SỐ
+                TESLA</div>
         </div>
     </div>
 
     <script>
-        // --- THAY ID SHEET CỦA BẠN VÀO ĐÂY ---
-        const SHEET_ID = '1gCjSiVawV6SyfE5TpBy4O1h-15xIA_Ocub7V433BC-E';
-        const SHEET_NAME = 'Quantum_Dashboard';
-        // Link API CSV (Dễ lấy dữ liệu nhất cho GitHub)
-        const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+        // URL WEB APP CỦA BẠN
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw1LJSamQn-_ZSJXXKHjDqwsbCrQ7DQyc8hXfOVJCY4xI_ktfObM4Q0zbNz7dXC00Smhw/exec';
 
-        // Matrix Rain Effect
+        // Hiệu ứng Matrix Rain
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         const chars = "0123456789ABCDEF$+-*/";
         const fontSize = 16;
         const drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
         function draw() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#0f0"; ctx.font = fontSize + "px monospace";
@@ -161,29 +181,32 @@
         }
         setInterval(draw, 35);
 
-        async function fetchFromSheet() {
+        async function fetchFromWebApp() {
             const btn = document.getElementById('btn');
             const advice = document.getElementById('advice-text');
+            const container = document.getElementById('num-container');
+
             btn.style.display = 'none';
-            advice.innerText = "ĐANG TRUY XUẤT TẦN SỐ TỪ VŨ TRỤ...";
+            container.innerHTML = ''; // Xóa số cũ nếu có
+            advice.innerText = "ĐANG TRUY XUẤT TẦN SỐ TESLA 3-6-9...";
 
             try {
-                const response = await fetch(DATA_URL);
-                const data = await response.text();
+                // Gọi dữ liệu từ Web App
+                const response = await fetch(WEB_APP_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
 
-                // Phân tích CSV đơn giản để lấy ô B7 và C5
-                // Ô B7 là dòng 7 cột 2, C5 là dòng 5 cột 3
-                const rows = data.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '')));
+                const data = await response.json();
 
-                // Lưu ý: CSV index bắt đầu từ 0. B7 là rows[6][1], C5 là rows[4][2]
-                const rawNumbers = rows[6][1];
-                const adviceData = rows[4][2];
-
-                const numbers = rawNumbers.split('   -   ');
-                displayResults(numbers, adviceData);
+                // data dự kiến: { "numbers": ["12", "21", ...], "advice": "..." }
+                if (data && data.numbers && data.numbers.length > 0) {
+                    displayResults(data.numbers, data.advice);
+                } else {
+                    throw new Error('Dữ liệu không đúng định dạng');
+                }
 
             } catch (error) {
-                advice.innerText = "LỖI KẾT NỐI SHEET. HÃY KIỂM TRA QUYỀN CHIA SẺ!";
+                console.error('Error:', error);
+                advice.innerText = "LỖI KẾT NỐI: HÃY ĐẢM BẢO WEB APP ĐÃ DEPLOY Ở CHẾ ĐỘ 'ANYONE'!";
                 btn.style.display = 'inline-block';
             }
         }
@@ -195,11 +218,15 @@
             nums.forEach((n, i) => {
                 const span = document.createElement('span');
                 span.className = 'digit';
-                span.innerText = n;
+                span.innerText = n.trim();
                 container.appendChild(span);
-                setTimeout(() => { span.style.display = 'inline-block'; }, i * 600);
+                // Hiệu ứng hiện số lần lượt
+                setTimeout(() => {
+                    span.style.display = 'inline-block';
+                }, i * 600);
             });
 
+            // Hiện QR sau khi tất cả số đã hiện xong
             setTimeout(() => {
                 document.getElementById('qr-section').style.display = 'block';
             }, nums.length * 600);
